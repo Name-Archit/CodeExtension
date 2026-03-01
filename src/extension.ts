@@ -2,27 +2,35 @@ import * as vscode from 'vscode';
 import { exec } from 'child_process';
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('archit_Extension is active!');
 
-	const saveListener = vscode.workspace.onDidSaveTextDocument((document) => {
+    console.log('archit-extension ACTIVATED');
 
-		if(document.languageId === 'cpp') {
+    const saveListener = vscode.workspace.onDidSaveTextDocument((document) => {
 
-			const filePath = document.fileName;
+        console.log("File saved:", document.fileName);
+        console.log("Language:", document.languageId);
 
-			exec(`g++ -std = c++17 "${filePath}" -o temp.exe`, (error, stdout, stderr) => {
+        if (document.languageId === 'cpp') {
 
-				if(error) {
-					vscode.window.showErrorMessage("Compilation Error: \n" + stderr);
-				}
-				else{
-					vscode.window.showInformationMessage("Compilation Succesfull");
-				}
-			});
-		}
-	});
+            vscode.window.showInformationMessage("C++ File Detected");
 
-	context.subscriptions.push(saveListener);
+            const filePath = document.fileName;
+
+            exec(`g++ -std=c++17 "${filePath}" -o temp.exe`, (error, stdout, stderr) => {
+
+                console.log("STDERR:", stderr);
+                console.log("STDOUT:", stdout);
+
+                if (error) {
+                    vscode.window.showErrorMessage("Compilation Error");
+                } else {
+                    vscode.window.showInformationMessage("Compilation Successful!");
+                }
+            });
+        }
+    });
+
+    context.subscriptions.push(saveListener);
 }
 
 export function deactivate() {}
